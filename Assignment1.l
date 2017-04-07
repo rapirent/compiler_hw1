@@ -41,7 +41,7 @@
 	void dump_symbol();
 	int linenum = 0;
     int num = 0;
-    type now_type;
+    type now_type = NONE;
 
 %}
 %x COMMENT
@@ -54,10 +54,13 @@ digit   [0-9]
 id      {letter}+({letter}|{digit})*
 number  {digit}+ 
 IF      [iI][fF]
+ELSE    [eE][lL][sS][eE]
 print   [Pp][Rr][Ii][Nn][Tt]
 WS      [ \t\v\f]
 STRING  \"({letter}|{digit}|{WS})*\"
 RELATION [\<(\<\=)(\>\=)\>(\=\=)(\!\=)]
+WHILE   [wW][hH][iI][lL][eE]
+
 
 
 %%
@@ -76,58 +79,62 @@ RELATION [\<(\<\=)(\>\=)\>(\=\=)(\!\=)]
                         strcpy(symbol_table->type_name,yytext);
                         now_type = DOUBLE;
                     }
-";" 				{
-                        printf("%s \t SEMICOLON \n",yytext); 
-                    }
+";" 				{   printf("%s \t SEMICOLON \n",yytext); }
+{IF}                {   printf("%s \t IF FUNCTION \n", yytext);}
+{ELSE}              {   printf("%s \t ELSE FUNCTION \n", yytext);}
+{WHILE}             {   printf("%s \t WHILE FUNCTION \n",yytext);}
 {print}				{   printf("%s \t PRINT FUNCTION \n", yytext);}
 "=" 				{   printf("%s \t ASSIGN \n",yytext);}
 [\+\-\*\/]		    {   printf("%s \t OPERTATOR \n",yytext);}
+{digit}+{id}        {}
 {id} 				{   
                         if(now_type == NONE) {
-                            if(lookup_symbol(yytext)==1) {
-                                printf("%s \t ID \n",yytext);
-                            }
-                            else {
-                                return 0;
-                            }
+                            /*if(lookup_symbol(yytext)==1) {*/
+                            printf("%s \t ID \n",yytext);
+                            /*}*/
                             
                         }
                         else {
+                            
                             if(now_type == INT) {
                                 printf("%s \t int TYPE VAR\n",yytext);
                             }
                             else {
                                 printf("%s \t double TYPE VAR\n",yytext);
                             }
-                            
+                            if(!num) {
+                                printf("Create a symbol table\n");
+                            }
+
                             insert_symbol(yytext);
                             now_type = NONE;
                         }
                     }
 {digit}+			{   printf("%s \t NUMBER \n",yytext);}
+{digit}+.{digit}+   {   printf("%s \t FLOATNUMBER \n",yytext);}
 "%"                 {   printf("%s \t REMAINDER \n",yytext);}
 "^"                 {   printf("%s \t EXPONENTIATION \n",yytext);}
 ","                 {   printf("%s \t COMMA \n",yytext);}
 "("                 {   printf("%s \t LB \n",yytext);}
 ")"                 {   printf("%s \t RB \n",yytext);}
 {RELATION}          {   printf("%s \t RELATIONAL \n",yytext);}
+[\n]				{   linenum++;} 
 {WS}                {}
+[\{\}]              {}
 
-
-"/*"                {BEGIN(COMMENT);}
-<COMMENT>"*/"       {BEGIN(INITIAL);}
+"/*"                {   BEGIN(COMMENT);}
+<COMMENT>"*/"       {   BEGIN(INITIAL);}
 <COMMENT>([^*]|\n)+|.   {}
 <COMMENT><<EOF>>    {
                         printf("unterminated comment\n");
                         return 0;
                     }
-"//".*\n            {}
-[\n]				{   linenum++;} 
+"//".*\n            {linenum++;}
 %%
 
- /*	C Code section */
+/*	C Code section */
 
- /*	You have to define your C function in this section */
+/*	You have to define your C function in this section */
 
 int main(int argc,char *argv[]){
 
@@ -135,11 +142,11 @@ int main(int argc,char *argv[]){
         fprintf(stderr,"you should enter a filename\n");
         return 1;
     }
-	yyin = fopen(argv[1],"r");
-	yylex();
-	dump_symbol();
+    yyin = fopen(argv[1],"r");
+    yylex();
+    dump_symbol();
 
-	return 0;
+    return 0;
 }
 
 int yywrap(void) {
@@ -147,9 +154,6 @@ int yywrap(void) {
 }
 
 void create_symbol() {
-    if(!num) {
-        printf("Create a symbol table\n");
-    }
     struct node *new_node;
     new_node = malloc(sizeof(struct node));
     if (new_node == NULL) {
@@ -171,8 +175,8 @@ void insert_symbol(char* s){
     if(lookup_symbol(s)==1) {
         return;   
     }
-    
-    
+
+
     symbol_table->num = ++num;
     strcpy(symbol_table->name,s);
 

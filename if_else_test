@@ -1,0 +1,7 @@
+if(a < 30) {
+    123abc;
+    double b;
+}
+else {
+    123;
+}
