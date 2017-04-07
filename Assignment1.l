@@ -120,7 +120,6 @@ WHILE   [wW][hH][iI][lL][eE]
 {RELATION}          {   printf("%s \t RELATIONAL \n",yytext);}
 [\n]				{   linenum++;} 
 {WS}                {}
-[\{\}]              {}
 
 "/*"                {   BEGIN(COMMENT);}
 <COMMENT>"*/"       {   BEGIN(INITIAL);}
@@ -130,6 +129,7 @@ WHILE   [wW][hH][iI][lL][eE]
                         return 0;
                     }
 "//".*\n            {linenum++;}
+.                   {}
 %%
 
 /*	C Code section */
@@ -195,7 +195,7 @@ int lookup_symbol(char* sym){
 }
 
 void dump_symbol(void){
-    printf("Parse over, the line number is %d.\n\n",linenum+1);
+    printf("Parse over, the line number is %d.\n\n",linenum);
     printf("The symbol table dump: \n");
     struct node *tmp = symbol_table;
     if(tmp == NULL) {
