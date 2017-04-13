@@ -121,14 +121,24 @@ WHILE   [wW][hH][iI][lL][eE]
 [\n]				{   linenum++;} 
 {WS}                {}
 
-"/*"                {   BEGIN(COMMENT);}
-<COMMENT>"*/"       {   BEGIN(INITIAL);}
-<COMMENT>([^*]|\n)+|.   {}
+"/*"                {   
+                        BEGIN(COMMENT);
+                        printf("COMMENT start\n");
+                    }
+<COMMENT>"*/"       {   
+                        BEGIN(INITIAL);
+                        printf("COMMENT end\n");
+                    }
+<COMMENT>\n         {   linenum++;}
+<COMMENT>.          {   }
 <COMMENT><<EOF>>    {
                         printf("unterminated comment\n");
                         return 0;
                     }
-"//".*\n            {linenum++;}
+"//".*\n            {   
+                        linenum++;
+                        printf("line COMMENT\n");
+                    }
 .                   {}
 %%
 
