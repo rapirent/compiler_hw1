@@ -57,7 +57,7 @@ IF      [iI][fF]
 ELSE    [eE][lL][sS][eE]
 print   [Pp][Rr][Ii][Nn][Tt]
 WS      [ \t\v\f]
-STRING  \"({letter}|{digit}|{WS})*\"
+STRING  \".*\"
 RELATION [\<(\<\=)(\>\=)\>(\=\=)(\!\=)]
 WHILE   [wW][hH][iI][lL][eE]
 

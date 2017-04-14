@@ -42,7 +42,7 @@
 	int linenum = 0;
     int num = 0;
     type now_type = NONE;
-
+    int pre_newline = 0;
 %}
 %x COMMENT
  /*	define regular expression label */
@@ -57,7 +57,7 @@ IF      [iI][fF]
 ELSE    [eE][lL][sS][eE]
 print   [Pp][Rr][Ii][Nn][Tt]
 WS      [ \t\v\f]
-STRING  \"({letter}|{digit}|{WS})*\"
+STRING  \".*\"
 RELATION [\<(\<\=)(\>\=)\>(\=\=)(\!\=)]
 WHILE   [wW][hH][iI][lL][eE]
 
@@ -66,27 +66,29 @@ WHILE   [wW][hH][iI][lL][eE]
 %%
  /*	Rules section */
 
-{STRING}            {   printf("%s \t STRING \n",yytext);}
+{STRING}            {   printf("%s \t STRING \n",yytext); pre_newline = 0;}
 {INT}               {
                         create_symbol();
                         now_type = INT;
                         strcpy(symbol_table->type_name,yytext);
                         symbol_table->t = INT;
+                        pre_newline = 0;
                     }
 {DOUBLE}            {
                         create_symbol();
                         symbol_table->t = DOUBLE;
                         strcpy(symbol_table->type_name,yytext);
                         now_type = DOUBLE;
+                        pre_newline = 0;
                     }
-";" 				{   printf("%s \t SEMICOLON \n",yytext); }
-{IF}                {   printf("%s \t IF FUNCTION \n", yytext);}
-{ELSE}              {   printf("%s \t ELSE FUNCTION \n", yytext);}
-{WHILE}             {   printf("%s \t WHILE FUNCTION \n",yytext);}
-{print}				{   printf("%s \t PRINT FUNCTION \n", yytext);}
-"=" 				{   printf("%s \t ASSIGN \n",yytext);}
-[\+\-\*\/]		    {   printf("%s \t OPERTATOR \n",yytext);}
-{digit}+{id}        {}
+";" 				{   printf("%s \t SEMICOLON \n",yytext); pre_newline = 0;}
+{IF}                {   printf("%s \t IF FUNCTION \n", yytext); pre_newline = 0;}
+{ELSE}              {   printf("%s \t ELSE FUNCTION \n", yytext); pre_newline = 0;}
+{WHILE}             {   printf("%s \t WHILE FUNCTION \n",yytext); pre_newline = 0;}
+{print}				{   printf("%s \t PRINT FUNCTION \n", yytext); pre_newline = 0;}
+"=" 				{   printf("%s \t ASSIGN \n",yytext); pre_newline = 0;}
+[\+\-\*\/]		    {   printf("%s \t OPERTATOR \n",yytext); pre_newline = 0;}
+{digit}+{id}        {   pre_newline = 0;}
 {id} 				{   
                         if(now_type == NONE) {
                             /*if(lookup_symbol(yytext)==1) {*/
@@ -109,37 +111,42 @@ WHILE   [wW][hH][iI][lL][eE]
                             insert_symbol(yytext);
                             now_type = NONE;
                         }
+                        pre_newline = 0;
                     }
-{digit}+			{   printf("%s \t NUMBER \n",yytext);}
-{digit}+.{digit}+   {   printf("%s \t FLOATNUMBER \n",yytext);}
-"%"                 {   printf("%s \t REMAINDER \n",yytext);}
-"^"                 {   printf("%s \t EXPONENTIATION \n",yytext);}
-","                 {   printf("%s \t COMMA \n",yytext);}
-"("                 {   printf("%s \t LB \n",yytext);}
-")"                 {   printf("%s \t RB \n",yytext);}
-{RELATION}          {   printf("%s \t RELATIONAL \n",yytext);}
-[\n]				{   linenum++;} 
-{WS}                {}
+{digit}+			{   printf("%s \t NUMBER \n",yytext); pre_newline = 0;}
+{digit}+.{digit}+   {   printf("%s \t FLOATNUMBER \n",yytext); pre_newline = 0;}
+"%"                 {   printf("%s \t REMAINDER \n",yytext); pre_newline = 0;}
+"^"                 {   printf("%s \t EXPONENTIATION \n",yytext); pre_newline = 0;}
+","                 {   printf("%s \t COMMA \n",yytext); pre_newline = 0;}
+"("                 {   printf("%s \t LB \n",yytext); pre_newline = 0;}
+")"                 {   printf("%s \t RB \n",yytext); pre_newline = 0;}
+{RELATION}          {   printf("%s \t RELATIONAL \n",yytext); pre_newline = 0;}
+[\n]				{   linenum++; pre_newline = 1;} 
+{WS}                {   pre_newline = 0;}
 
 "/*"                {   
                         BEGIN(COMMENT);
                         printf("COMMENT start\n");
+                        pre_newline = 0;
                     }
 <COMMENT>"*/"       {   
                         BEGIN(INITIAL);
                         printf("COMMENT end\n");
+                        pre_newline = 1;
                     }
-<COMMENT>\n         {   linenum++;}
-<COMMENT>.          {   }
+<COMMENT>\n         {   linenum++; pre_newline = 1;}
+<COMMENT>.          {   pre_newline = 0;}
 <COMMENT><<EOF>>    {
                         printf("unterminated comment\n");
+                        pre_newline = 0;
                         return 0;
                     }
 "//".*\n            {   
                         linenum++;
                         printf("line COMMENT\n");
+                        pre_newline = 1;
                     }
-.                   {}
+.                   {   pre_newline = 0;}
 %%
 
 /*	C Code section */
@@ -154,6 +161,9 @@ int main(int argc,char *argv[]){
     }
     yyin = fopen(argv[1],"r");
     yylex();
+    if(pre_newline == 0) {
+        linenum++;
+    }
     dump_symbol();
 
     return 0;
