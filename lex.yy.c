@@ -563,7 +563,7 @@ char *yytext;
 	int linenum = 0;
     int num = 0;
     type now_type = NONE;
-
+    int pre_newline = 0;
 
 /*	define regular expression label */
 #line 570 "lex.yy.c"
@@ -849,7 +849,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 69 "Assignment1.l"
-{   printf("%s \t STRING \n",yytext);}
+{   printf("%s \t STRING \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
@@ -859,61 +859,63 @@ YY_RULE_SETUP
                         now_type = INT;
                         strcpy(symbol_table->type_name,yytext);
                         symbol_table->t = INT;
+                        pre_newline = 0;
                     }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 76 "Assignment1.l"
+#line 77 "Assignment1.l"
 {
                         create_symbol();
                         symbol_table->t = DOUBLE;
                         strcpy(symbol_table->type_name,yytext);
                         now_type = DOUBLE;
+                        pre_newline = 0;
                     }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 82 "Assignment1.l"
-{   printf("%s \t SEMICOLON \n",yytext); }
+#line 84 "Assignment1.l"
+{   printf("%s \t SEMICOLON \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 83 "Assignment1.l"
-{   printf("%s \t IF FUNCTION \n", yytext);}
+#line 85 "Assignment1.l"
+{   printf("%s \t IF FUNCTION \n", yytext); pre_newline = 0;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 84 "Assignment1.l"
-{   printf("%s \t ELSE FUNCTION \n", yytext);}
+#line 86 "Assignment1.l"
+{   printf("%s \t ELSE FUNCTION \n", yytext); pre_newline = 0;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 85 "Assignment1.l"
-{   printf("%s \t WHILE FUNCTION \n",yytext);}
+#line 87 "Assignment1.l"
+{   printf("%s \t WHILE FUNCTION \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 86 "Assignment1.l"
-{   printf("%s \t PRINT FUNCTION \n", yytext);}
+#line 88 "Assignment1.l"
+{   printf("%s \t PRINT FUNCTION \n", yytext); pre_newline = 0;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 87 "Assignment1.l"
-{   printf("%s \t ASSIGN \n",yytext);}
+#line 89 "Assignment1.l"
+{   printf("%s \t ASSIGN \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 88 "Assignment1.l"
-{   printf("%s \t OPERTATOR \n",yytext);}
+#line 90 "Assignment1.l"
+{   printf("%s \t OPERTATOR \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 89 "Assignment1.l"
-{}
+#line 91 "Assignment1.l"
+{   pre_newline = 0;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 90 "Assignment1.l"
+#line 92 "Assignment1.l"
 {   
                         if(now_type == NONE) {
                             /*if(lookup_symbol(yytext)==1) {*/
@@ -936,113 +938,118 @@ YY_RULE_SETUP
                             insert_symbol(yytext);
                             now_type = NONE;
                         }
+                        pre_newline = 0;
                     }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 113 "Assignment1.l"
-{   printf("%s \t NUMBER \n",yytext);}
+#line 116 "Assignment1.l"
+{   printf("%s \t NUMBER \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 114 "Assignment1.l"
-{   printf("%s \t FLOATNUMBER \n",yytext);}
+#line 117 "Assignment1.l"
+{   printf("%s \t FLOATNUMBER \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 115 "Assignment1.l"
-{   printf("%s \t REMAINDER \n",yytext);}
+#line 118 "Assignment1.l"
+{   printf("%s \t REMAINDER \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 116 "Assignment1.l"
-{   printf("%s \t EXPONENTIATION \n",yytext);}
+#line 119 "Assignment1.l"
+{   printf("%s \t EXPONENTIATION \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 117 "Assignment1.l"
-{   printf("%s \t COMMA \n",yytext);}
+#line 120 "Assignment1.l"
+{   printf("%s \t COMMA \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 118 "Assignment1.l"
-{   printf("%s \t LB \n",yytext);}
+#line 121 "Assignment1.l"
+{   printf("%s \t LB \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 119 "Assignment1.l"
-{   printf("%s \t RB \n",yytext);}
+#line 122 "Assignment1.l"
+{   printf("%s \t RB \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 120 "Assignment1.l"
-{   printf("%s \t RELATIONAL \n",yytext);}
+#line 123 "Assignment1.l"
+{   printf("%s \t RELATIONAL \n",yytext); pre_newline = 0;}
 	YY_BREAK
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 121 "Assignment1.l"
-{   linenum++;} 
+#line 124 "Assignment1.l"
+{   linenum++; pre_newline = 1;} 
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 122 "Assignment1.l"
-{}
+#line 125 "Assignment1.l"
+{   pre_newline = 0;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 124 "Assignment1.l"
+#line 127 "Assignment1.l"
 {   
                         BEGIN(COMMENT);
                         printf("COMMENT start\n");
+                        pre_newline = 0;
                     }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 128 "Assignment1.l"
+#line 132 "Assignment1.l"
 {   
                         BEGIN(INITIAL);
                         printf("COMMENT end\n");
+                        pre_newline = 1;
                     }
 	YY_BREAK
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 132 "Assignment1.l"
-{   linenum++;}
+#line 137 "Assignment1.l"
+{   linenum++; pre_newline = 1;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 133 "Assignment1.l"
-{   }
+#line 138 "Assignment1.l"
+{   pre_newline = 0;}
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 134 "Assignment1.l"
+#line 139 "Assignment1.l"
 {
                         printf("unterminated comment\n");
+                        pre_newline = 0;
                         return 0;
                     }
 	YY_BREAK
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 138 "Assignment1.l"
+#line 144 "Assignment1.l"
 {   
                         linenum++;
                         printf("line COMMENT\n");
+                        pre_newline = 1;
                     }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 142 "Assignment1.l"
-{}
+#line 149 "Assignment1.l"
+{   pre_newline = 0;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 143 "Assignment1.l"
+#line 150 "Assignment1.l"
 ECHO;
 	YY_BREAK
-#line 1046 "lex.yy.c"
+#line 1053 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2043,7 +2050,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 143 "Assignment1.l"
+#line 150 "Assignment1.l"
 
 
 
@@ -2059,6 +2066,9 @@ int main(int argc,char *argv[]){
     }
     yyin = fopen(argv[1],"r");
     yylex();
+    if(pre_newline == 0) {
+        linenum++;
+    }
     dump_symbol();
 
     return 0;
